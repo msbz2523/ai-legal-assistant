@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+aiofiles
+python-multipart
+pillow
+numpy
+requests
+PyMuPDF
+easyocr
+sentence-transformers
+# LLaMA-basierter Index (lokal)
+llama-index>=0.10.0
+llama-index-llms-ollama
+llama-index-embeddings-ollama
