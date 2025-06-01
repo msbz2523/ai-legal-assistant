@@ -1,17 +1,6 @@
 from transformers import pipeline
 import torch
 
-LEGAL_GLOSSARY_DE_AR = {
-    "Schadensersatz": "التعويض القانوني",
-    "Verjährung": "تقادم دعوى",
-    "notleidende Forderung": "دين متعثر",
-    "Mahnung": "إنذار بالدفع",
-    "Vertrag": "عقد قانوني",
-    "Pflicht": "واجب قانوني",
-    "Haftung": "مسؤولية قانونية",
-    "Klage": "دعوى قضائية"
-}
-
 translator = pipeline(
     "translation",
     model="Helsinki-NLP/opus-mt-de-ar",
@@ -23,10 +12,7 @@ translator = pipeline(
 def translate_to_arabic(text: str) -> str:
     """
     Übersetzt deutschen Text professionell ins Arabische.
-    Nutzt stabiles Übersetzungsmodell + juristisches Glossar.
+    Nutzt stabiles Übersetzungsmodell, keine LLM-Fantasie.
     """
-    for de_term, ar_term in LEGAL_GLOSSARY_DE_AR.items():
-        text = text.replace(de_term, ar_term)
-
     translation = translator(text, max_length=600)[0]["translation_text"]
     return translation

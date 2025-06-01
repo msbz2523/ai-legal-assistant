@@ -157,6 +157,9 @@
 
             <div class="section-title">⚖️ Empfehlung:</div>
             <p id="legal_recommendation"></p>
+            <div class="section-title">📚 Genutzte Paragraphen:</div>
+            <ul id="used_paragraphs" style="padding-left: 1em;"></ul>
+
         </div>
     </div>
 </div>
@@ -185,11 +188,15 @@
         resultDiv.style.display = 'none';
 
         try {
+            console.log("Sende Anfrage an Backend...");
+        
             const response = await fetch('http://127.0.0.1:8000/api/extract-summarize', {
                 method: 'POST',
                 body: formData
             });
-
+            
+            console.log("Antwort empfangen:", response);
+            
             if (!response.ok) {
                 throw new Error(`Server antwortete mit Status ${response.status}`);
             }
@@ -199,6 +206,20 @@
             originalText.textContent = data.original_text || "Kein Text extrahiert.";
             summaryText.textContent = data.summary || "Keine Zusammenfassung vorhanden.";
             legalAdvice.textContent = data.legal_recommendation || "";
+            const usedList = document.getElementById('used_paragraphs');
+            usedList.innerHTML = '';
+
+            if (data.used_paragraphs && Array.isArray(data.used_paragraphs) && data.used_paragraphs.length > 0) {
+                data.used_paragraphs.forEach(paragraph => {
+                    const li = document.createElement('li');
+                    li.textContent = paragraph;
+                    usedList.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.textContent = "Keine Paragraphen erkannt oder im Index enthalten.";
+                usedList.appendChild(li);
+            }
 
             resultDiv.style.display = 'block';
         } catch (error) {

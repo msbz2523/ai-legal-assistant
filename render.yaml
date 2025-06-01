@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: ai-legal-assistant
-    runtime: docker
-    plan: free
-    region: frankfurt
-    envVars:
-      - key: ENV
-        value: production

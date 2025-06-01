@@ -1,5 +1,3 @@
-# validation_service.py
-
 import re
 
 BANNED_PHRASES = [
@@ -11,25 +9,42 @@ BANNED_PHRASES = [
     "wird auf jeden Fall"
 ]
 
-# Ergänze juristische Begriffe, die nicht ohne Kontext vorkommen dürfen
 CONTEXTUAL_FLAGS = [
     r"(?<!nicht )rechtsverbindlich",
     r"entspricht.*?§\s*\d+",
-    r"ist.*?verpflichtet"
+    r"ist.*?verpflichtet",
+    r"kann .*?klagen",
+    r"kann .*?klage .*?einreichen",
+    r"recht auf klage",
+    r"klage .*?einreichen"
 ]
 
 def validate_output(text: str) -> bool:
     """
-    Validiert den juristischen Text auf riskante Aussagen oder Formulierungen.
-    Gibt False zurück, wenn riskante Phrasen oder unreflektierte Rechtsansprüche enthalten sind.
+    Validiert juristischen Text auf riskante Aussagen.
+    Gibt False zurück bei unzulässigen Formulierungen oder missverständlichen Rechtsbehauptungen.
     """
     text_lower = text.lower()
     for phrase in BANNED_PHRASES:
         if phrase in text_lower:
             return False
 
-    for regex in CONTEXTUAL_FLAGS:
-        if re.search(regex, text_lower):
+    for pattern in CONTEXTUAL_FLAGS:
+        if re.search(pattern, text_lower):
             return False
 
     return True
+
+def soften_risky_phrases(text: str) -> str:
+    """
+    Entschärft kritische Aussagen automatisch, ohne sie komplett zu entfernen.
+    Beispiel: 'kann klagen' → 'kann rechtlich prüfen lassen'
+    """
+    replacements = [
+        (r"kann.*?klage.*?einreichen", "sollte rechtlichen Rat einholen"),
+        (r"kann.*?klagen", "könnte rechtlich prüfen lassen"),
+        (r"recht auf klage", "Anspruch sollte rechtlich überprüft werden")
+    ]
+    for pattern, replacement in replacements:
+        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+    return text
